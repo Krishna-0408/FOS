@@ -7,6 +7,10 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from app.schemas.user_schema import LoginRequest
 from app.core.dependencies import get_current_user
 from app.database.models.user import User
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+security = HTTPBearer()
+
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -51,3 +55,15 @@ def profile(
             "city": current_user.city
         }
     }
+@router.post("/logout")
+def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+):
+
+    token = credentials.credentials
+
+    return AuthService.logout(
+        db,
+        token
+    )

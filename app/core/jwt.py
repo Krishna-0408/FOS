@@ -1,10 +1,14 @@
 from datetime import datetime, timedelta
-from jose import jwt,JWTError
-from app.core.config import settings
+
+from jose import jwt, JWTError
 from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.repository.token_repository import TokenRepository
+
 
 def create_access_token(data: dict):
-
     to_encode = data.copy()
 
     expire = datetime.utcnow() + timedelta(
@@ -19,7 +23,14 @@ def create_access_token(data: dict):
         algorithm=settings.ALGORITHM
     )
 
-def verify_access_token(token: str):
+
+def verify_access_token(token: str, db: Session):
+    # Check if token is blacklisted
+    if TokenRepository.is_blacklisted(db, token):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been logged out."
+        )
 
     try:
         payload = jwt.decode(

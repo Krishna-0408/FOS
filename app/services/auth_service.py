@@ -1,4 +1,6 @@
 
+import token
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
@@ -11,6 +13,8 @@ from fastapi import BackgroundTasks
 from app.schemas.user_schema import LoginRequest
 from app.core.security import verify_password
 from app.core.jwt import create_access_token
+from app.repository.token_repository import TokenRepository
+
 class AuthService:
 
     @staticmethod
@@ -104,4 +108,18 @@ class AuthService:
             "name": db_user.name,
             "email": db_user.email
         }
+    }
+
+    
+    @staticmethod
+    def logout(db: Session, token: str):
+
+        TokenRepository.blacklist_token(
+        db,
+        token
+    )
+
+        return {
+        "status": True,
+        "message": "Logout successful."
     }
