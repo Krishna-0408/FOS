@@ -71,3 +71,38 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str
+    confirm_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_password(cls, value):
+        pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#^()_+=-]).{8,}$'
+
+        if not re.match(pattern, value):
+            raise ValueError(
+                "Password must contain uppercase, lowercase, number and special character."
+            )
+
+        return value
+
+    @model_validator(mode="after")
+    def password_match(self):
+        if self.new_password != self.confirm_password:
+            raise ValueError(
+                "Password and Confirm Password do not match."
+            )
+
+        return self

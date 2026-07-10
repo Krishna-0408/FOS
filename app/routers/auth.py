@@ -8,7 +8,9 @@ from app.schemas.user_schema import LoginRequest
 from app.core.dependencies import get_current_user
 from app.database.models.user import User
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
+from app.schemas.user_schema import ForgotPasswordRequest
+from app.schemas.user_schema import VerifyOTPRequest
+from app.schemas.user_schema import ResetPasswordRequest
 security = HTTPBearer()
 
 
@@ -66,4 +68,39 @@ def logout(
     return AuthService.logout(
         db,
         token
+    )
+
+@router.post("/forgot-password")
+def forgot_password(
+    request: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+
+    return AuthService.forgot_password(
+        db,
+        request,
+        background_tasks
+    )
+
+@router.post("/verify-otp")
+def verify_otp(
+    request: VerifyOTPRequest,
+    db: Session = Depends(get_db)
+):
+
+    return AuthService.verify_otp(
+        db,
+        request
+    )
+
+@router.post("/reset-password")
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+
+    return AuthService.reset_password(
+        db,
+        request
     )
