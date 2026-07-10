@@ -44,7 +44,6 @@ class UserSignup(BaseModel):
             raise ValueError(
                 "Password must be at least 8 characters and contain an uppercase letter, lowercase letter, number, and special character."
             )
-
         return value
 
     @model_validator(mode="after")
@@ -52,12 +51,23 @@ class UserSignup(BaseModel):
         if self.password != self.confirm_password:
             raise ValueError("Password and Confirm Password do not match.")
         return self
-    
-    class UserResponse(BaseModel):
-        id: int
-        name: str
-        phone: str
-        email: EmailStr
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    phone: str
+    email: EmailStr
 
     class Config:
         from_attributes = True
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
