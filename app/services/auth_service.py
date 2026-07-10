@@ -24,6 +24,8 @@ from app.schemas.user_schema import ForgotPasswordRequest
 from app.schemas.user_schema import VerifyOTPRequest
 from app.schemas.user_schema import ResetPasswordRequest
 from app.core.security import hash_password
+from app.schemas.user_schema import ChangePasswordRequest
+from app.core.security import verify_password, hash_password
 
 class AuthService:
 
@@ -273,4 +275,45 @@ class AuthService:
         return {
         "status": True,
         "message": "Password reset successfully."
+    }
+
+
+    @staticmethod
+    def change_password(
+    db: Session,
+    current_user,
+    request: ChangePasswordRequest
+):
+
+        if not verify_password(
+        request.current_password,
+        current_user.password
+    ):
+            raise HTTPException(
+            status_code=400,
+            detail="Current password is incorrect."
+        )
+
+        if verify_password(
+        request.new_password,
+        current_user.password
+    ):
+            raise HTTPException(
+            status_code=400,
+            detail="New password cannot be the same as the current password."
+        )
+
+        hashed_password = hash_password(
+        request.new_password
+    )
+
+        UserRepository.update_password(
+        db,
+        current_user,
+        hashed_password
+    )
+
+        return {
+        "status": True,
+        "message": "Password changed successfully."
     }

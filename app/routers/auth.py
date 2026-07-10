@@ -11,6 +11,8 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from app.schemas.user_schema import ForgotPasswordRequest
 from app.schemas.user_schema import VerifyOTPRequest
 from app.schemas.user_schema import ResetPasswordRequest
+from app.schemas.user_schema import ChangePasswordRequest
+
 security = HTTPBearer()
 
 
@@ -102,5 +104,18 @@ def reset_password(
 
     return AuthService.reset_password(
         db,
+        request
+    )
+
+@router.post("/change-password")
+def change_password(
+    request: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return AuthService.change_password(
+        db,
+        current_user,
         request
     )

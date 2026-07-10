@@ -106,3 +106,32 @@ class ResetPasswordRequest(BaseModel):
             )
 
         return self
+    
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    confirm_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_password(cls, value):
+
+        pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#^()_+=-]).{8,}$'
+
+        if not re.match(pattern, value):
+            raise ValueError(
+                "Password must contain uppercase, lowercase, number and special character."
+            )
+
+        return value
+
+    @model_validator(mode="after")
+    def password_match(self):
+
+        if self.new_password != self.confirm_password:
+            raise ValueError(
+                "New Password and Confirm Password do not match."
+            )
+
+        return self
