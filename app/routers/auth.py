@@ -12,7 +12,7 @@ from app.schemas.user_schema import ForgotPasswordRequest
 from app.schemas.user_schema import VerifyOTPRequest
 from app.schemas.user_schema import ResetPasswordRequest
 from app.schemas.user_schema import ChangePasswordRequest
-
+from app.schemas.user_schema import UpdateProfileRequest
 security = HTTPBearer()
 
 
@@ -44,21 +44,7 @@ def login(
         user
     )
 
-@router.get("/profile")
-def profile(
-    current_user: User = Depends(get_current_user)
-):
 
-    return {
-        "status": True,
-        "data": {
-            "id": current_user.id,
-            "name": current_user.name,
-            "email": current_user.email,
-            "phone": current_user.phone,
-            "city": current_user.city
-        }
-    }
 @router.post("/logout")
 def logout(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -115,6 +101,40 @@ def change_password(
 ):
 
     return AuthService.change_password(
+        db,
+        current_user,
+        request
+    )
+
+@router.get("/profile")
+def get_profile(
+    current_user: User = Depends(get_current_user)
+):
+
+    return {
+        "status": True,
+        "data": {
+            "id": current_user.id,
+            "name": current_user.name,
+            "phone": current_user.phone,
+            "email": current_user.email,
+            "address": current_user.address,
+            "place": current_user.place,
+            "city": current_user.city,
+            "district": current_user.district,
+            "pincode": current_user.pincode
+        }
+    }
+
+
+@router.put("/profile")
+def update_profile(
+    request: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+
+    return AuthService.update_profile(
         db,
         current_user,
         request

@@ -135,3 +135,36 @@ class ChangePasswordRequest(BaseModel):
             )
 
         return self
+    
+
+
+
+class UpdateProfileRequest(BaseModel):
+    name: str
+    phone: str
+    address: str
+    place: str
+    city: str
+    district: str
+    pincode: str
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value):
+        if len(value.strip()) < 3:
+            raise ValueError("Name must contain at least 3 characters.")
+        return value.strip()
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, value):
+        if not re.fullmatch(r"\d{10}", value):
+            raise ValueError("Phone number must contain exactly 10 digits.")
+        return value
+
+    @field_validator("pincode")
+    @classmethod
+    def validate_pincode(cls, value):
+        if not re.fullmatch(r"\d{6}", value):
+            raise ValueError("Pincode must contain exactly 6 digits.")
+        return value

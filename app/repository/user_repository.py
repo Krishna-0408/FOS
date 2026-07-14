@@ -66,3 +66,34 @@ class UserRepository:
         db.refresh(user)
 
         return user
+    
+
+    @staticmethod
+    def get_user_by_phone(db: Session, phone: str):
+
+        return (
+        db.query(User)
+        .filter(User.phone == phone)
+        .first()
+    )
+
+
+    @staticmethod
+    def update_profile(
+        db: Session,
+        user: User,
+        request
+):
+
+        user.name = request.name
+        user.phone = request.phone
+        user.address = request.address
+        user.place = request.place
+        user.city = request.city
+        user.district = request.district
+        user.pincode = request.pincode
+
+        db.commit()
+        db.refresh(user)
+
+        return user

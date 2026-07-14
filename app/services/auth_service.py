@@ -26,6 +26,7 @@ from app.schemas.user_schema import ResetPasswordRequest
 from app.core.security import hash_password
 from app.schemas.user_schema import ChangePasswordRequest
 from app.core.security import verify_password, hash_password
+from app.schemas.user_schema import UpdateProfileRequest
 
 class AuthService:
 
@@ -316,4 +317,48 @@ class AuthService:
         return {
         "status": True,
         "message": "Password changed successfully."
+    }
+
+
+    @staticmethod
+    def update_profile(
+    db: Session,
+    current_user,
+    request: UpdateProfileRequest
+):
+
+        existing_user = UserRepository.get_user_by_phone(
+        db,
+        request.phone
+    )
+
+        if (
+        existing_user
+        and existing_user.id != current_user.id
+    ):
+            raise HTTPException(
+            status_code=400,
+            detail="Phone number already exists."
+        )
+
+        updated_user = UserRepository.update_profile(
+        db,
+        current_user,
+        request
+    )
+
+        return {
+        "status": True,
+        "message": "Profile updated successfully.",
+        "data": {
+            "id": updated_user.id,
+            "name": updated_user.name,
+            "phone": updated_user.phone,
+            "email": updated_user.email,
+            "address": updated_user.address,
+            "place": updated_user.place,
+            "city": updated_user.city,
+            "district": updated_user.district,
+            "pincode": updated_user.pincode
+        }
     }
