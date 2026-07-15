@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.core import email
-from app.database.models.user import User
+from app.database.models.user import User, UserRole
 from app.schemas.user_schema import UserSignup
 from app.core.security import hash_password
 
@@ -10,11 +9,27 @@ class UserRepository:
 
     @staticmethod
     def get_user_by_email(db: Session, email: str):
-        return db.query(User).filter(User.email == email).first()
+        return (
+            db.query(User)
+            .filter(User.email == email)
+            .first()
+        )
 
     @staticmethod
     def get_user_by_phone(db: Session, phone: str):
-        return db.query(User).filter(User.phone == phone).first()
+        return (
+            db.query(User)
+            .filter(User.phone == phone)
+            .first()
+        )
+
+    @staticmethod
+    def get_user_by_id(db: Session, user_id: int):
+        return (
+            db.query(User)
+            .filter(User.id == user_id)
+            .first()
+        )
 
     @staticmethod
     def create_user(db: Session, user: UserSignup):
@@ -28,7 +43,8 @@ class UserRepository:
             city=user.city,
             district=user.district,
             pincode=user.pincode,
-            password=hash_password(user.password)
+            password=hash_password(user.password),
+            role=UserRole.CUSTOMER
         )
 
         db.add(new_user)
@@ -38,52 +54,25 @@ class UserRepository:
         return new_user
 
     @staticmethod
-    def get_user_by_id(db: Session, user_id: int):
-        return db.query(User).filter(User.id == user_id).first()
-    
-
-    @staticmethod
-    def get_user_by_email(db: Session, email: str):
-
-        return (
-        db.query(User)
-        .filter(User.email == email)
-        .first()
-    )
-
-
-    @staticmethod
     def update_password(
-    db: Session,
-    user,
-    hashed_password
-):
+        db: Session,
+        user: User,
+        hashed_password: str
+    ):
 
         user.password = hashed_password
 
         db.commit()
-
         db.refresh(user)
 
         return user
-    
-
-    @staticmethod
-    def get_user_by_phone(db: Session, phone: str):
-
-        return (
-        db.query(User)
-        .filter(User.phone == phone)
-        .first()
-    )
-
 
     @staticmethod
     def update_profile(
         db: Session,
         user: User,
         request
-):
+    ):
 
         user.name = request.name
         user.phone = request.phone

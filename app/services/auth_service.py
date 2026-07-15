@@ -107,7 +107,8 @@ class AuthService:
         token = create_access_token(
         {
             "sub": db_user.email,
-            "user_id": db_user.id
+            "user_id": db_user.id,
+            "role": db_user.role.value
         }
     )
 
@@ -119,7 +120,8 @@ class AuthService:
         "user": {
             "id": db_user.id,
             "name": db_user.name,
-            "email": db_user.email
+            "email": db_user.email,
+             "role": db_user.role.value
         }
     }
 

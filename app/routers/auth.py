@@ -139,3 +139,4 @@ def update_profile(
         current_user,
         request
     )
+

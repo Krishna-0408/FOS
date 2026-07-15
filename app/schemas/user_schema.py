@@ -168,3 +168,5 @@ class UpdateProfileRequest(BaseModel):
         if not re.fullmatch(r"\d{6}", value):
             raise ValueError("Pincode must contain exactly 6 digits.")
         return value
+    
+    

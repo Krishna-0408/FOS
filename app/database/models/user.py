@@ -1,8 +1,24 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+import enum
+
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Integer,
+    String,
+    Text
+)
 from sqlalchemy.sql import func
 
 from app.database.database import Base
-from sqlalchemy import Boolean
+
+
+class UserRole(str, enum.Enum):
+    CUSTOMER = "CUSTOMER"
+    RESTAURANT_ADMIN = "RESTAURANT_ADMIN"
+    SUPER_ADMIN = "SUPER_ADMIN"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -11,9 +27,19 @@ class User(Base):
 
     name = Column(String(100), nullable=False)
 
-    phone = Column(String(10), unique=True, nullable=False, index=True)
+    phone = Column(
+        String(10),
+        unique=True,
+        nullable=False,
+        index=True
+    )
 
-    email = Column(String(100), unique=True, nullable=False, index=True)
+    email = Column(
+        String(100),
+        unique=True,
+        nullable=False,
+        index=True
+    )
 
     address = Column(Text, nullable=False)
 
@@ -26,8 +52,29 @@ class User(Base):
     pincode = Column(String(6), nullable=False)
 
     password = Column(String(255), nullable=False)
-    is_verified = Column(Boolean, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    role = Column(
+        Enum(UserRole),
+        nullable=False,
+        default=UserRole.CUSTOMER
+    )
+
+    is_active = Column(
+        Boolean,
+        default=True,
+        nullable=False
+    )
+
+    is_verified = Column(
+        Boolean,
+        default=False,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
 
     updated_at = Column(
         DateTime(timezone=True),
